@@ -1,0 +1,1165 @@
+/* 画面全体を覆うラッパー */
+.map-wrapper {
+  height: 109vh;
+  background-color: #000;
+  display: flex;
+  justify-content: flex-end; /* 右寄せに変更 */
+  padding-left: 300px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* SVG地図全体 */
+.map-svg {
+  height: 100vh;
+  width: 100%;
+  max-width: none;
+  object-fit: cover;
+  transform: scale(1.13) translateX(1.6%); /* scaleとtranslateXを組み合わせる */
+}
+
+/* 現在ステージの巻物をジャンプさせる（より自然な減衰付きジャンプ） */
+.label-frame.jump {
+  position: relative;
+  animation: jumpBounce 1.8s ease-in-out infinite;
+  z-index: 9999;
+}
+
+.jump-group {
+  animation: jumpG 1.8s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes jumpG {
+  0%   { transform: translateY(0); }
+  10%  { transform: translateY(-18px); }
+  20%  { transform: translateY(0); }
+  30%  { transform: translateY(-12px); }
+  40%  { transform: translateY(0); }
+  50%  { transform: translateY(-6px); }
+  60%  { transform: translateY(0); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes jumpBounce {
+  0%   { transform: translateY(0); }
+  10%  { transform: translateY(-18px); }
+  20%  { transform: translateY(0); }
+  30%  { transform: translateY(-12px); }
+  40%  { transform: translateY(0); }
+  50%  { transform: translateY(-6px); }
+  60%  { transform: translateY(0); }
+  100% { transform: translateY(0); }
+}
+
+/* BGMトグルボタン（左下固定） */
+.bgm-toggle {
+  position: absolute;
+  bottom: 30px; /* topではなくbottomを使用 */
+  left: 10px;
+  z-index: 1100;
+}
+
+.bgm-button {
+  background-color: #444;
+  color: #fff;
+  border: none;
+  padding: 4px 8px; /* 8px 16pxから半分に縮小 */
+  border-radius: 3px; /* 5pxから3pxに縮小 */
+  cursor: pointer;
+  font-size: 0.7rem; /* 0.9remから0.7remに縮小 */
+  transition: background-color 0.3s ease;
+}
+
+.bgm-button:hover {
+  background-color: #666;
+}
+
+/* フルスクリーン動画表示用 */
+.video-fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  background-color: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.fullscreen-video {
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+}
+
+/* 巻物背景のラベル枠 */
+.label-frame {
+  background: url('./assets/scroll-label.png') no-repeat center center;
+  background-size: cover;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  pointer-events: none;
+  font-family: 'MedievalSharp', serif;
+  z-index: 1;
+  pointer-events: auto;
+}
+
+/* ラベルのテキスト（巻物内） */
+.label-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-52%, -45%);
+  color: #3b1e00;
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+  text-shadow: 1px 1px 2px #fff8dc;
+  pointer-events: none;
+  width: 100%;
+  z-index: 1;
+}
+
+.complete-button {
+  position: relative;
+  background: linear-gradient(145deg, #e6c36e 0%, #b08b2c 50%, #7a5a1e 100%);
+  color: #fff8dc;
+  border: 2px solid #c5a652;
+  padding: 0.6rem 1.4rem;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 8px;
+  margin: 1rem;
+  cursor: not-allowed;
+  opacity: 1;
+  font-family: 'Cinzel', serif;
+  overflow: hidden;
+  box-shadow: 0 0 12px rgba(230, 195, 110, 0.4), 0 0 24px rgba(122, 90, 30, 0.2);
+}
+
+/* 輝きのアニメーション（そのままでOK） */
+.complete-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.5) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: skewX(-20deg);
+  animation: shine 2s infinite;
+}
+
+@keyframes shine {
+  0% {
+    left: -75%;
+  }
+  100% {
+    left: 125%;
+  }
+}
+
+/* 背景画像のアニメーション */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.map-back-button {
+  position: relative;
+  background: linear-gradient(135deg, #005f73, #0a9396);
+  color: #fff;
+  border: 2px solid #53c3d0;
+  padding: 0.6rem 1.4rem;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 10px;
+  margin: 1rem;
+  cursor: pointer;
+  font-family: 'Cinzel', serif;
+  box-shadow: 0 0 10px rgba(10, 147, 150, 0.4);
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.map-back-button:hover {
+  background: linear-gradient(135deg, #118ab2, #38bdf8);
+  box-shadow: 0 0 15px rgba(56, 189, 248, 0.6), 0 0 25px rgba(56, 189, 248, 0.3);
+  transform: scale(1.05);
+}
+
+.read-button {
+  position: relative;
+  background: linear-gradient(135deg, #1e5128, #4caf50);
+  color: #fffbe6;
+  border: 2px solid #a9d18e;
+  padding: 0.6rem 1.6rem;
+  font-size: 1.05rem;
+  font-weight: bold;
+  border-radius: 10px;
+  margin: 1rem;
+  cursor: pointer;
+  font-family: 'Cinzel', serif;
+  box-shadow: 0 0 10px rgba(72, 188, 128, 0.4);
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.read-button:hover {
+  background: linear-gradient(135deg, #2e7d32, #81c784);
+  box-shadow: 0 0 15px rgba(129, 199, 132, 0.6), 0 0 25px rgba(129, 199, 132, 0.3);
+  transform: scale(1.05);
+}
+
+.crown-icon {
+  font-size: 1rem;
+  margin-right: 0.4rem;
+  filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.6));
+  animation: crownBounce 2s ease-in-out infinite;
+}
+
+@keyframes crownBounce {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-4px); }
+}
+
+.start-button {
+  background: linear-gradient(145deg, #8e44ad, #5e3370);
+  color: #fff;
+  border: none;
+  padding: 1rem 2rem;
+  font-size: 1.4rem;
+  font-weight: bold;
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: 'Cinzel', serif;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+  transition: all 0.3s ease;
+}
+
+.start-button:hover {
+  background: linear-gradient(145deg, #9b59b6, #6c3483);
+  box-shadow: 0 6px 14px rgba(155, 89, 182, 0.6);
+  transform: scale(1.05);
+}
+
+/* ステータスバーとレーダーチャートのコンテナ */
+.stats-container {
+  position: absolute;
+  bottom: 70px;
+  left: 10px;
+  display: flex;
+  gap: 5px;
+  z-index: 1000;
+}
+
+/* ステータスバー用のコンテナ */
+.status-bars {
+  width: 140px;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 8px 8px 8px 8px;
+  border-radius: 4px;
+  border: 1px solid #666;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+}
+
+/* ステータスバーの各アイテム */
+.status-item {
+  margin-bottom: 4px;
+}
+
+/* ステータスラベル */
+.status-label {
+  color: #fff;
+  font-size: 8px;
+  display: block;
+  margin-bottom: 2px;
+  margin-left: 2px;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+}
+
+/* ステータスバーの背景 */
+.status-bar-bg {
+  width: 100%;
+  height: 6px;
+  background: #333;
+  border-radius: 3px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* ステータスバーの進捗部分 */
+.status-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+/* 各ステータスの色 */
+.vitality { background: linear-gradient(90deg, #ff0000, #ff3333); }
+.mental { background: linear-gradient(90deg, #ff6b6b, #ff8787); }
+.action { background: linear-gradient(90deg, #4dabf7, #74c0fc); }
+.cooperation { background: linear-gradient(90deg, #51cf66, #69db7c); }
+.knowledge { background: linear-gradient(90deg, #ffd43b, #ffd93d); }
+.persistence { background: linear-gradient(90deg, #be4bdb, #da77f2); }
+
+/* レーダーチャート用のコンテナ */
+.radar-chart {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.7); /* 背景色を追加 */
+  border-radius: 4px; /* 角丸を追加 */
+  border: 1px solid #666; /* 枠線を追加 */
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.5); /* シャドウを追加 */
+}
+
+/* レーダーチャートのSVG */
+.radar-svg {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: 1;
+  transform: scale(1.2); /* スケールを追加してMAX値の枠を拡大 */
+  transform-origin: center; /* 中心から拡大するように設定 */
+}
+
+/* レーダーチャートの背景の六角形 */
+.radar-bg {
+  fill: none;
+  stroke: #666;
+  stroke-width: 1.5;
+  opacity: 0.4;
+}
+
+/* レーダーチャートのデータの六角形 */
+.radar-data {
+  fill: rgba(255, 140, 0, 0.2); /* 紫から薄いオレンジに変更 */
+  stroke: rgba(255, 140, 0, 0.8); /* 紫から濃いオレンジに変更 */
+  stroke-width: 2;
+  transform-origin: center;
+}
+
+/* レーダーチャートのラベル */
+.radar-labels {
+  position: absolute;
+  color: #fff;
+  font-size: 8px;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+  white-space: nowrap; /* ラベルが折り返されないようにする */
+}
+
+/* 各ラベルの位置を調整 */
+.radar-label-vitality {
+  top: 7px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.radar-label-mental {
+  top: 25%;
+  right: 2%;
+}
+
+.radar-label-action {
+  bottom: 26%;
+  right: 2%;
+}
+
+.radar-label-cooperation {
+  bottom: 7px;
+  right: 42%;
+}
+
+.radar-label-knowledge {
+  bottom: 41px;
+  left: 7.5%;
+}
+
+.radar-label-persistence {
+  bottom: 67%;
+  left: 2.6%;
+}
+
+/* 進捗表示エリアのスタイル */
+.progress-container {
+  position: absolute;
+  top: 20px;
+  left: 10px;
+  width: 298px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid #666;
+  border-radius: 4px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.progress-title {
+  color: #fff;
+  font-size: 12px;
+  margin-top: 5px;
+  text-align: center;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.level-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+  margin-left: 3px;  /* 左側のマージンを追加 */
+  justify-content: flex-start;  /* 左寄せのまま */
+}
+
+.level-label {
+  color: #ffd700;
+  font-size: 16px;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.level-max {
+  color: #999;
+  font-size: 12px;
+  margin-left: 5px;
+}
+
+.exp-bar-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.exp-bar-bg {
+  flex-grow: 1;
+  height: 8px;
+  background: #333;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.exp-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4fc3f7, #03a9f4);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+  box-shadow: 0 0 5px rgba(79, 195, 247, 0.5);
+}
+
+.exp-text {
+  color: #4fc3f7;
+  font-size: 10px;
+  min-width: 36px;
+  text-align: right;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+}
+
+/* 光の動きを表現する疑似要素のアニメーション */
+@keyframes lightMove {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* オーバーレイのスタイル */
+.opening-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    rgba(0, 0, 0, 0.7),
+    rgba(0, 0, 0, 0.5),
+    rgba(0, 0, 0, 0.7)
+  );
+  z-index: 1;
+}
+
+/* RPGスタイルのスキップボタン共通デザイン */
+.rpg-skip-button {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: linear-gradient(to bottom, #2c1810 0%, #1a0f0a 100%);
+  color: #d4af37;
+  border: 2px solid #8b734b;
+  border-radius: 4px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 1100;
+  font-family: 'Cinzel', serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  box-shadow: 
+    0 0 0 1px rgba(139, 115, 75, 0.4),
+    0 2px 4px rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rpg-skip-button:hover {
+  background: linear-gradient(to bottom, #3d231a 0%, #251510 100%);
+  border-color: #9c835c;
+  color: #ffd700;
+  transform: translateY(-1px);
+  box-shadow: 
+    0 0 0 1px rgba(139, 115, 75, 0.6),
+    0 3px 6px rgba(0, 0, 0, 0.5);
+}
+
+.rpg-skip-button:active {
+  transform: translateY(1px);
+  box-shadow: 
+    0 0 0 1px rgba(139, 115, 75, 0.4),
+    0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+@keyframes titleGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.3));
+    text-shadow: 
+      0 0 5px rgba(255, 215, 0, 0.3),
+      0 0 10px rgba(255, 215, 0, 0.2),
+      2px 2px 4px rgba(184, 134, 11, 0.5);
+  }
+  50% {
+    filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.5));
+    text-shadow: 
+      0 0 10px rgba(255, 215, 0, 0.5),
+      0 0 20px rgba(255, 215, 0, 0.4),
+      0 0 30px rgba(255, 215, 0, 0.3),
+      2px 2px 4px rgba(184, 134, 11, 0.5);
+  }
+}
+
+/* タイトルのコンテナ用スタイル */
+.title-shine-container {
+  position: relative;
+  overflow: hidden;
+  padding: 0.5em;
+}
+
+/* タイトルの基本スタイル */
+.title-text {
+  background: linear-gradient(
+    90deg,
+    #ffd700 0%,
+    #fff6c8 25%,
+    #ffd700 50%,
+    #b8860b 75%,
+    #ffd700 100%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: shineEffect 3s linear infinite;
+  position: relative;
+  text-shadow: 
+    0 0 10px rgba(255, 215, 0, 0.4),
+    2px 2px 4px rgba(184, 134, 11, 0.6);
+}
+
+/* 横方向の光沢アニメーション */
+@keyframes shineEffect {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+/* インベントリコンテナ */
+.inventory-container {
+  position: absolute;
+  top: 120px;
+  left: 10px;
+  width: 298px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid #666;
+  border-radius: 4px;
+  padding: 15px 12px;  /* 33pxから15pxに変更して余白を調整 */
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.inventory-title {
+  color: #ffd700;
+  font-size: 12px;
+  text-align: center;
+  margin-bottom: 8px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  font-family: 'Cinzel', serif;
+}
+
+.inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 4px;
+}
+
+.inventory-slot {
+  aspect-ratio: 1;
+  background: rgba(82, 73, 95, 0.6);  /* 深い紫がかった色に変更 */
+  border: 1px solid #8b7355;  /* ボーダーを金属的な色に */
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: default;
+  transition: all 0.3s ease;
+  box-shadow: inset 0 0 4px rgba(255, 255, 255, 0.1);  /* 内側の光沢を追加 */
+}
+
+.inventory-slot.obtained {
+  background: rgba(102, 93, 115, 0.7);  /* 取得済みは少し明るく */
+  border-color: #a18c6c;  /* ボーダーも明るく */
+  box-shadow: 
+    inset 0 0 6px rgba(255, 215, 0, 0.2),
+    inset 0 0 2px rgba(255, 255, 255, 0.2);  /* 金色と白の光沢を組み合わせ */
+}
+
+.inventory-slot:hover.obtained {
+  transform: scale(1.1);
+  box-shadow: 
+    inset 0 0 8px rgba(255, 215, 0, 0.4),
+    inset 0 0 4px rgba(255, 255, 255, 0.3),
+    0 0 12px rgba(255, 215, 0, 0.2);
+}
+
+.item-icon {
+  font-size: 16px;
+  filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.5));
+  animation: itemGlow 2s ease-in-out infinite;
+}
+
+@keyframes itemGlow {
+  0%, 100% { transform: scale(1); filter: brightness(1); }
+  50% { transform: scale(1.1); filter: brightness(1.2); }
+}
+
+.custom-item-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.5));
+  transition: all 0.3s ease;
+}
+
+/* 剣アイコン用の専用クラス */
+.sword-icon {
+  width: 33px;  /* 剣アイコンのみ大きくする */
+  height: 23px;
+  margin-top: 4px;  /* 下に移動するためのマージンを追加 */
+  position: relative;  /* 位置調整のため */
+  top: 2px;          /* 微調整用 */
+}
+
+/* 鎧アイコン用の専用クラス */
+.armor-icon {
+  width: 33px;
+  height: 23px;
+  margin-top: 4px;
+  position: relative;
+  top: 2px;
+}
+
+.inventory-slot.obtained .custom-item-icon:hover {
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.4));
+}
+
+/* 盾アイコン用の専用クラス */
+.shield-icon {
+  width: 33px;
+  height: 23px;
+  margin-top: 4px;
+  position: relative;
+  top: 2px;
+}
+
+/* 兜アイコン用の専用クラス */
+.helmet-icon {
+  width: 33px;
+  height: 23px;
+  margin-top: 4px;
+  position: relative;
+  top: 2px;
+}
+
+/* 馬アイコン用の専用クラス */
+.horse-icon {
+  width: 33px;
+  height: 23px;
+  margin-top: 4px;
+  position: relative;
+  top: 2px;
+}
+
+/* 炎の魔法アイコン用の専用クラス */
+.fire-icon {
+  width: 33px;
+  height: 23px;
+  margin-top: 4px;
+  position: relative;
+  top: 2px;
+  filter: drop-shadow(0 0 5px rgba(255, 69, 0, 0.5));  /* 炎っぽい光効果を追加 */
+}
+
+/* 鍵アイコン用の専用クラス */
+.key-icon {
+  width: 33px;
+  height: 23px;
+  margin-top: 4px;
+  position: relative;
+  top: 2px;
+  filter: drop-shadow(0 0 3px rgba(255, 215, 0, 0.4));  /* 金属的な光沢効果を追加 */
+}
+
+/* 本アイコン用の専用クラス */
+.book-icon {
+  width: 33px;
+  height: 23px;
+  margin-top: 4px;
+  position: relative;
+  top: 2px;
+  filter: drop-shadow(0 0 3px rgba(139, 69, 19, 0.4));  /* 本らしい茶色の光沢効果を追加 */
+}
+
+/* 水の魔法アイコン用の専用クラス */
+.water-icon {
+  width: 33px;
+  height: 23px;
+  margin-top: 4px;
+  position: relative;
+  top: 2px;
+  filter: drop-shadow(0 0 4px rgba(0, 191, 255, 0.5));  /* 水っぽい青い光効果を追加 */
+}
+
+/* 魔法の杖アイコン用の専用クラス */
+.staff-icon {
+  width: 33px;
+  height: 23px;
+  margin-top: 4px;
+  position: relative;
+  top: 2px;
+  filter: drop-shadow(0 0 4px rgba(147, 112, 219, 0.5));  /* 魔法らしい紫の光効果を追加 */
+}
+
+/* 宝の地図アイコン用の専用クラス */
+.map-item-icon {
+  width: 33px;
+  height: 23px;
+  margin-top: 4px;
+  position: relative;
+  top: 2px;
+  filter: drop-shadow(0 0 4px rgba(205, 133, 63, 0.5));  /* 古い羊皮紙のような効果を追加 */
+}
+
+/* バルログの爪アイコン用の専用クラス */
+.claw-icon {
+  width: 33px;
+  height: 23px;
+  margin-top: 4px;
+  position: relative;
+  top: 2px;
+  filter: drop-shadow(0 0 4px rgba(139, 0, 0, 0.5));  /* 邪悪な雰囲気を演出する赤い光効果を追加 */
+}
+
+/* 雷の呪文アイコン用の専用クラス */
+.thunder-icon {
+  width: 33px;
+  height: 23px;
+  margin-top: 4px;
+  position: relative;
+  top: 2px;
+  filter: drop-shadow(0 0 4px rgba(255, 255, 0, 0.6));  /* 雷らしい黄色の光効果を追加 */
+}
+
+/* ハンマーアイコン用の専用クラス */
+.hammer-icon {
+  width: 33px;
+  height: 23px;
+  margin-top: 4px;
+  position: relative;
+  top: 2px;
+  filter: drop-shadow(0 0 4px rgba(169, 169, 169, 0.5));  /* 金属的な光沢効果を追加 */
+}
+
+
+.celebration-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 9000;        /* ベースレイヤー */
+}
+
+.celebration-character {
+  width: 280px;  /* サイズを少し小さく */
+  height: auto;
+  margin-bottom: 1.5rem;  /* マージンを調整 */
+  animation: bounceIn 1s ease-out;
+}
+
+/* 次へ進むボタン - 最前面 */
+.continue-button-container {
+  position: fixed;
+  bottom: 40px;
+  right: 180px;
+  transform: none;
+  z-index: 9999;        /* 最前面 */
+  margin: 0;
+  padding: 0;
+  width: auto;
+  pointer-events: all;
+}
+
+/* ボタン自体のスタイルはそのまま */
+.continue-button {
+  background: linear-gradient(145deg, #2c5282, #1a365d);
+  color: #ffffff;
+  border: none;
+  padding: 0.4rem 1.2rem;
+  font-size: 0.8rem;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'Cinzel', serif;
+  box-shadow: 0 0 8px rgba(44, 82, 130, 0.3);
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+/* ホバー時の効果も調整 */
+.continue-button:hover {
+  background: linear-gradient(145deg, #3182ce, #2b6cb0);
+  transform: translateY(-1px); /* 動きをさらに小さく */
+  box-shadow: 0 0 15px rgba(49, 130, 206, 0.5);
+}
+
+/* レスポンシブ対応も追加 */
+@media screen and (max-width: 968px) {
+  .continue-button-container {
+    position: fixed !important;  /* 優先度を上げる */
+    bottom: 20px !important;
+    right: 20px !important;
+    transform: none !important;
+    margin: 0 !important;
+  }
+}
+
+/* レスポンシブ対応を単純化 */
+@media screen and (max-width: 968px) {
+  .continue-button-container {
+    bottom: 20px !important;
+    right: 20px !important;
+  }
+}
+
+/* お祝いコンテンツの基本レイアウト */
+.celebration-content {
+  position: relative;
+  width: 100%;
+  height: 90vh;
+  max-width: 1400px;
+  margin: 3.5rem auto;
+  overflow: visible;
+  z-index: 9002;        /* オーバーレイの上 */
+}
+
+/* 証書コンテナ - 独立して配置 */
+.certificate-container {
+  position: absolute;
+  left: 30%;
+  top: 45%;
+  transform: translateY(-50%);
+  width: 65%;
+  max-width: 420px;
+  z-index: 1;          /* 最も低い値 */
+}
+
+.certificate-image {
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.4));
+  /* transform: rotate(-3deg); を削除または以下のように変更 */
+  transform: rotate(0deg);
+  transition: transform 0.3s ease;
+}
+
+.celebration-character {
+  width: 20%;
+  height: auto;
+  filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.3));
+  animation: slideUpFadeIn 1s ease-out;
+}
+
+@keyframes slideUpFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* キャラクターコンテナの基本スタイル */
+.character-container {
+  position: absolute;
+  right: -40%;
+  bottom: -30px;
+  width: 130%;
+  max-width: 1500px;
+  min-width: 1200px;
+  z-index: 2;          /* 証書より上 */
+}
+
+/* レスポンシブ対応 - 大画面 */
+@media screen and (max-width: 1200px) {
+  .character-container {
+    right: 2%;
+    width: 40%;
+    min-width: 350px;
+    bottom: -120px;
+  }
+
+  .certificate-container {
+    left: 5%;
+    width: 55%;
+    max-width: 550px;
+    margin-left: 2%;
+  }
+}
+
+@media screen and (max-width: 968px) {
+  .celebration-content {
+    height: auto;
+    padding: 2rem;
+  }
+
+  .certificate-container {
+    position: relative;
+    left: auto;
+    top: auto;
+    transform: none;
+    width: 90%;
+    margin: 0 auto;
+  }
+
+  .character-container {
+    position: relative;
+    right: auto;
+    bottom: auto;
+    width: 70%;
+    margin: 2rem auto 0;
+    min-width: 300px;
+  }
+}
+
+/* 吹き出しの位置調整とスタイリング */
+.speech-bubble {
+  position: absolute;
+  right: 42%;
+  bottom: 99%;
+  background: linear-gradient(to bottom, #fffbf2, #fff6e5);  /* 羊皮紙風のグラデーション */
+  border: 2px solid #d4b483;  /* アンティーク風の枠線 */
+  border-radius: 0px;
+  padding: 8px 10px;
+  max-width: 300px;
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.15),
+    inset 0 1px 3px rgba(255, 255, 255, 0.8);  /* 内側の光沢 */
+  z-index: 9003;
+  font-family: "PixelMplus12", "Press Start 2P", "Cinzel", serif;  /* ピクセルフォントやRPG風フォント */
+  line-height: 1.3;
+  opacity: 0;
+  animation: fadeInBubble 1.5s ease-out forwards;
+  animation-delay: 2s;
+  transform-origin: bottom center;
+}
+
+/* 吹き出しの尻尾 */
+.speech-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -16px;
+  right: 52%;
+  border-width: 12px 0 12px 15px;
+  border-style: solid;
+  border-color: transparent transparent transparent #fff6e5;  /* 吹き出しの背景色に合わせる */
+  transform: rotate(-40deg);
+  filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.1));
+  margin-bottom: 1px;
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+
+/* 吹き出し内のテキスト */
+.speech-text {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #44281e;  /* アンティーク風の濃い茶色 */
+  letter-spacing: 0.04em;
+  font-weight: 500;
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.8);  /* テキストの縁取り効果 */
+}
+
+/* フェードインアニメーション */
+@keyframes fadeInBubble {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 話者の名前表示 */
+.speaker-name {
+  position: absolute;
+  top: -27px;
+  left: -2px;
+  background: linear-gradient(to bottom, #4a3223, #2c1810);
+  color: #ffd700;
+  padding: 4px 6px;
+  border-radius: 0px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  border: 2px solid #8b734b;
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 1px 3px rgba(255, 255, 255, 0.1);
+  font-family: "PixelMplus12", "Press Start 2P", "Cinzel", serif;
+  white-space: nowrap;
+  z-index: 1;
+}
+
+/* 名前の装飾用の疑似要素 */
+.speaker-name::before {
+  color: #ffd700;
+  margin-right: 6px;
+  font-size: 0.8em;
+}
+
+.speaker-name::after {
+  color: #ffd700;
+  margin-left: 6px;
+  font-size: 0.8em;
+}
+
+/* ボタングループのスタイル */
+.button-group {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin: 2rem auto;
+  max-width: 800px;
+}
+
+/* 各ボタンの基本スタイル調整 */
+.read-button,
+.field-button,
+.map-back-button {
+  flex: 0 0 auto;
+  margin: 0; /* マージンを0に設定して、gapプロパティでスペースを制御 */
+  min-width: 180px; /* ボタンの最小幅を設定 */
+  text-align: center;
+  justify-content: center;
+}
+
+/* ボタン内のアイコンとテキストのレイアウト */
+.read-button,
+.field-button,
+.map-back-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* レスポンシブ対応 */
+@media screen and (max-width: 768px) {
+  .button-group {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .read-button,
+  .field-button,
+  .map-back-button {
+    width: 100%;
+    max-width: 280px;
+  }
+}
+
+/* フィールドへ出るボタン */
+.field-button {
+  position: relative;
+  background: linear-gradient(145deg, #8e44ad, #5e3370);
+  color: #ffffff;
+  border: 2px solid #9b59b6;
+  padding: 0.6rem 1.4rem;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Cinzel', serif;
+  box-shadow: 0 0 10px rgba(142, 68, 173, 0.4);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden; /* アニメーション効果範囲を制限 */
+}
+
+.field-button:hover {
+  background: linear-gradient(145deg, #9b59b6, #6c3483);
+  transform: translateY(-2px); /* scaleからtranslateYに変更 */
+  box-shadow: 0 0 15px rgba(155, 89, 182, 0.6), 0 0 25px rgba(155, 89, 182, 0.3);
+}
+
+/* 剣アイコンのアニメーション */
+.field-button .sword-icon {
+  transition: transform 0.3s ease;
+}
+
+.field-button:hover .sword-icon {
+  transform: rotate(-15deg);
+}

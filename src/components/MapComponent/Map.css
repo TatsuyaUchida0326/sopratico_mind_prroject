@@ -1,0 +1,43 @@
+/* 追加: 余白・スクロール防止、全画面化 */
+html, body, #root {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #000;
+}
+
+.battle-field-container {
+  width: 100%;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.return-button {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 10;
+  padding: 10px 15px;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.return-button:hover {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.game-field-wrapper {
+  width: 100%;
+  height: 100%;
+}
+
+.phaser-container {
+  width: 100%;
+  height: 100%;
+}
