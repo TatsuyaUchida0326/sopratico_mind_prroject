@@ -1,8 +1,5 @@
 // タイル
 import grassTile from '../../assets/grass.png';
-import forestTile from '../../assets/forest.png';
-import castleTile from '../../assets/castle.png';
-import rockTile from '../../assets/rock.png';
 
 // 主人公用の画像
 import characterDown1 from '../../assets/character_down_1.png';
@@ -50,9 +47,6 @@ import fieldBgm from '../../assets/field_bgm.mp3';
 // エクスポート
 export const tiles = {
   grass: grassTile,
-  tree: forestTile, 
-  castle: castleTile,
-  rock: rockTile
 };
 
 export const characters = {
@@ -89,9 +83,6 @@ export const audio = {
 // 元のコードとの互換性のために個別にエクスポート（必要な場合）
 export {
   grassTile,
-  forestTile,
-  castleTile,
-  rockTile,
   characterDown1,
   characterDown2,
   characterRight1,
@@ -100,29 +91,5 @@ export {
   characterUp2,
   characterLeft1,
   characterLeft2,
-  character1Down1,
-  character1Down2,
-  character1Right1,
-  character1Right2,
-  character1Up1,
-  character1Up2,
-  character1Left1,
-  character1Left2,
-  character2Down1,
-  character2Down2,
-  character2Right1,
-  character2Right2,
-  character2Up1,
-  character2Up2,
-  character2Left1,
-  character2Left2,
-  character3Down1,
-  character3Down2,
-  character3Right1,
-  character3Right2,
-  character3Up1,
-  character3Up2,
-  character3Left1,
-  character3Left2,
   fieldBgm
 };

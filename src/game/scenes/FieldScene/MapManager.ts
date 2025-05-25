@@ -18,6 +18,7 @@ export function createGrid(scene: FieldScene) {
 
 // マップデータの初期化
 export function initializeMapData(scene: FieldScene) {
+  // ローカルストレージのデータがあればそれを使う
   const savedMapData = localStorage.getItem('customMapData');
   if (savedMapData) {
     scene.mapData = JSON.parse(savedMapData);
@@ -26,16 +27,7 @@ export function initializeMapData(scene: FieldScene) {
     for (let y = 0; y < scene.mapSize; y++) {
       scene.mapData[y] = [];
       for (let x = 0; x < scene.mapSize; x++) {
-        scene.mapData[y][x] = 0;
-        if (x === 0 || y === 0 || x === scene.mapSize - 1 || y === scene.mapSize - 1) {
-          scene.mapData[y][x] = 3;
-        }
-        if (x !== scene.playerGridX && y !== scene.playerGridY && Math.random() < 0.15) {
-          scene.mapData[y][x] = 1;
-        }
-        if (x !== scene.playerGridX && y !== scene.playerGridY && Math.random() < 0.01) {
-          scene.mapData[y][x] = 2;
-        }
+        scene.mapData[y][x] = 0; // 0 = 草原のみ
       }
     }
   }
@@ -54,9 +46,11 @@ export function updateChunks(scene: FieldScene) {
   scene.lastPlayerChunkY = playerChunkY;
 
   const loadDistance = scene.loadDistance;
+  const chunkCount = Math.ceil(scene.mapSize / scene.chunkSize);
+
   for (let y = playerChunkY - loadDistance; y <= playerChunkY + loadDistance; y++) {
     for (let x = playerChunkX - loadDistance; x <= playerChunkX + loadDistance; x++) {
-      if (x < 0 || y < 0 || x >= scene.mapSize / scene.chunkSize || y >= scene.mapSize / scene.chunkSize) {
+      if (x < 0 || y < 0 || x >= chunkCount || y >= chunkCount) {
         continue;
       }
       const chunkKey = `${x},${y}`;
@@ -87,11 +81,14 @@ export function loadChunk(scene: FieldScene, chunkKey: string) {
 
   const startX = chunkX * scene.chunkSize;
   const startY = chunkY * scene.chunkSize;
-  const endX = Math.min(startX + scene.chunkSize, 256);
-  const endY = Math.min(startY + scene.chunkSize, 256);
+  const endX = Math.min(startX + scene.chunkSize, scene.mapSize);
+  const endY = Math.min(startY + scene.chunkSize, scene.mapSize);
 
   for (let y = startY; y < endY; y++) {
     for (let x = startX; x < endX; x++) {
+      // ここでmapSize外はスキップ（念のため）
+      if (x < 0 || y < 0 || x >= scene.mapSize || y >= scene.mapSize) continue;
+
       const tileType = scene.mapData[y][x];
       const tileX = scene.grid[y][x].x;
       const tileY = scene.grid[y][x].y;

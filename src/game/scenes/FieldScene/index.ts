@@ -11,16 +11,15 @@ import {
 import { getTileTypeName } from './TileUtils';
 
 export class FieldScene extends Phaser.Scene {
-  // プロパティ定義
   public grid: { x: number; y: number }[][] = [];
   public playerMarker?: Phaser.GameObjects.Sprite;
   public lastDirection: string = 'down';
   public miniMapActive: boolean = false;
-  public mapSize: number = 32;
+  public mapSize: number = 20;
   public cursors?: Phaser.Types.Input.Keyboard.CursorKeys;
   public canMove: boolean = true;
-  public playerGridX: number = 16;
-  public playerGridY: number = 16;
+  public playerGridX: number = 10;
+  public playerGridY: number = 10;
   public movementSpeed: number = 0.3;
   public mapData: number[][] = [];
   public spaceKey?: Phaser.Input.Keyboard.Key;
@@ -29,9 +28,10 @@ export class FieldScene extends Phaser.Scene {
   public nextMoveDirection: string | null = null;
   public chunkSize: number = 16;
   public activeChunks = new Map<string, Map<string, Phaser.GameObjects.GameObject[]>>();
+  public isMoving: boolean = false;
   public loadDistance: number = 2;
-  public lastPlayerChunkX: number = 0;
-  public lastPlayerChunkY: number = 0;
+  public lastPlayerChunkX: number = -1;
+  public lastPlayerChunkY: number = -1;
 
   // マップエディター関連プロパティ
   public editMode: boolean = false;
@@ -58,9 +58,6 @@ export class FieldScene extends Phaser.Scene {
 
   preload() {
     this.load.image('grass', tiles.grass);
-    this.load.image('tree', tiles.tree);
-    this.load.image('castle', tiles.castle);
-    this.load.image('rock', tiles.rock);
 
     this.load.image('character_down_1', characters.player.down[0]);
     this.load.image('character_down_2', characters.player.down[1]);
@@ -118,14 +115,20 @@ export class FieldScene extends Phaser.Scene {
     this.bgm = this.sound.add('field_bgm', { loop: true, volume: 0.5 });
     this.bgm.play();
 
+    // カメラ設定の追加
+    this.cameras.main.setBounds(0, 0, this.mapSize * 64, this.mapSize * 64);
     this.cameras.main.setZoom(1.0);
     this.cameras.main.roundPixels = true;
     this.cameras.main.setBackgroundColor(0x000000);
     this.cameras.main.setLerp(0, 0);
     this.cameras.main.setDeadzone(0, 0);
 
+    // プレイヤーをカメラが追従
     if (this.playerMarker) {
       this.cameras.main.startFollow(this.playerMarker, true, 0, 0);
+    } else {
+      // プレイヤーがいない場合はマップ中央にカメラを合わせる
+      this.cameras.main.centerOn(this.playerGridX * 64, this.playerGridY * 64);
     }
 
     this.input.keyboard?.on('keydown-E', () => this.toggleEditMode(), this);
@@ -158,9 +161,27 @@ export class FieldScene extends Phaser.Scene {
     this.miniMapActive = !this.miniMapActive;
 
     if (this.miniMapActive) {
-      this.cameras.main.setZoom(0.2);
+      // フィールド全体が画面に収まるズーム値を計算
+      const zoomX = this.cameras.main.width / (this.mapSize * 64);
+      const zoomY = this.cameras.main.height / (this.mapSize * 64);
+      const zoom = Math.min(zoomX, zoomY);
+      
+      this.cameras.main.stopFollow();
+      this.cameras.main.setZoom(zoom);
+      this.cameras.main.setBounds(0, 0, this.mapSize * 64, this.mapSize * 64);
+      this.cameras.main.centerOn(
+        (this.mapSize * 64) / 2,
+        (this.mapSize * 64) / 2
+      );
     } else {
+      // 通常表示に戻す
       this.cameras.main.setZoom(1.0);
+      this.cameras.main.setBounds(0, 0, this.mapSize * 64, this.mapSize * 64);
+      if (this.playerMarker) {
+        this.cameras.main.startFollow(this.playerMarker, true, 0.1, 0.1);
+      } else {
+        this.cameras.main.centerOn(this.playerGridX * 64, this.playerGridY * 64);
+      }
     }
   }
 

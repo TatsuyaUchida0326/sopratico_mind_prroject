@@ -14,9 +14,6 @@ export function createEditorUI(scene: FieldScene) {
   // パレットアイテム
   const items = [
     { type: 'grass', label: '草原', y: 40, scale: 1.0 },
-    { type: 'tree', label: '森', y: 100, scale: 0.05 },
-    { type: 'castle', label: 'お城', y: 160, scale: 0.1 },
-    { type: 'rock', label: '岩山', y: 220, scale: 0.05 }
   ];
 
   items.forEach(item => {

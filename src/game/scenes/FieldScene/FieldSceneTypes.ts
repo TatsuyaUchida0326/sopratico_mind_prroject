@@ -19,6 +19,7 @@ export type FieldScene = Phaser.Scene & {
   nextMoveDirection: string | null;
   chunkSize: number;
   activeChunks: Map<string, Map<string, Phaser.GameObjects.GameObject[]>>;
+  isMoving: boolean;
   loadDistance: number;
   lastPlayerChunkX: number;
   lastPlayerChunkY: number;
