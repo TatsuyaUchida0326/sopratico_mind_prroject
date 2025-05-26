@@ -1,5 +1,9 @@
 // タイル
 import grassTile from '../../assets/grass.png';
+import forestTile from '../../assets/forest.png';
+import brickTile from '../../assets/brick.png';
+import woodBarrierTile from '../../assets/wood_barrier.png';
+import woodBarrierVerticalTile from '../../assets/wood_barrier_vertical.png';
 
 // 主人公用の画像
 import characterDown1 from '../../assets/character_down_1.png';
@@ -47,6 +51,10 @@ import fieldBgm from '../../assets/field_bgm.mp3';
 // エクスポート
 export const tiles = {
   grass: grassTile,
+  forest: forestTile,
+  brick: brickTile,
+  wood_barrier: woodBarrierTile,
+  wood_barrier_vertical: woodBarrierVerticalTile,
 };
 
 export const characters = {

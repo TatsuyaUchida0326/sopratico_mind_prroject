@@ -18,8 +18,8 @@ export class FieldScene extends Phaser.Scene {
   public mapSize: number = 20;
   public cursors?: Phaser.Types.Input.Keyboard.CursorKeys;
   public canMove: boolean = true;
-  public playerGridX: number = 10;
-  public playerGridY: number = 10;
+  public playerGridX: number = 2;
+  public playerGridY: number = 2;
   public movementSpeed: number = 0.3;
   public mapData: number[][] = [];
   public spaceKey?: Phaser.Input.Keyboard.Key;
@@ -57,7 +57,14 @@ export class FieldScene extends Phaser.Scene {
   }
 
   preload() {
+    // デバッグ: brick画像のパス確認
+    console.log('brick:', tiles.brick);
+
     this.load.image('grass', tiles.grass);
+    this.load.image('forest', tiles.forest);
+    this.load.image('brick', tiles.brick);
+    this.load.image('wood_barrier', tiles.wood_barrier);
+    this.load.image('wood_barrier_vertical', tiles.wood_barrier_vertical);
 
     this.load.image('character_down_1', characters.player.down[0]);
     this.load.image('character_down_2', characters.player.down[1]);
@@ -70,13 +77,18 @@ export class FieldScene extends Phaser.Scene {
 
     this.load.audio('field_bgm', audio.fieldBgm);
 
+    this.load.once('filecomplete-image-brick', () => {
+      console.log('brick loaded!');
+    });
+
     this.load.on('complete', () => {
       console.log('FieldScene: すべてのアセットが読み込まれました');
     });
   }
 
   create() {
-    // アニメーション定義
+    this.cursors = this.input.keyboard?.createCursorKeys();
+
     this.anims.create({
       key: 'player_down',
       frames: [{ key: 'character_down_1' }, { key: 'character_down_2' }],
@@ -104,7 +116,6 @@ export class FieldScene extends Phaser.Scene {
 
     createGrid(this);
 
-    this.cursors = this.input.keyboard?.createCursorKeys();
     this.spaceKey = this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
     initializeMapData(this);
@@ -150,11 +161,19 @@ export class FieldScene extends Phaser.Scene {
   }
 
   update(time: number, _delta: number) {
+    // デバッグ: updateが毎フレーム呼ばれているか確認
+    console.log('update');
+
     updatePlayerMovement(this, showMessage, getTileTypeName);
     if (time % 5 === 0) {
       updateChunks(this);
     }
     animatePlayer(this);
+
+    // 座標表示の更新を追加
+    if (this.positionText) {
+      this.positionText.setText(`x: ${this.playerGridX}, y: ${this.playerGridY}`);
+    }
   }
 
   public toggleMiniMap() {

@@ -8,7 +8,7 @@ export function createUI(scene: FieldScene) {
     backgroundColor: '#000000'
   });
   scene.positionText.setScrollFactor(0);
-  scene.positionText.setDepth(1000);
+  scene.positionText.setDepth(2000);
 
   scene.speedText = scene.add.text(10, 40, `Speed: ${scene.movementSpeed}`, {
     font: '16px Arial',
@@ -16,7 +16,7 @@ export function createUI(scene: FieldScene) {
     backgroundColor: '#000000'
   });
   scene.speedText.setScrollFactor(0);
-  scene.speedText.setDepth(1000);
+  scene.speedText.setDepth(2000);
 
   scene.helpText = scene.add.text(
     scene.cameras.main.width - 10,
@@ -31,7 +31,7 @@ export function createUI(scene: FieldScene) {
   );
   scene.helpText.setOrigin(1, 0);
   scene.helpText.setScrollFactor(0);
-  scene.helpText.setDepth(1000);
+  scene.helpText.setDepth(2000);
 
   scene.input.keyboard?.on('keydown-M', scene.toggleMiniMap, scene);
 

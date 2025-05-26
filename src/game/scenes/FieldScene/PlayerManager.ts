@@ -3,13 +3,13 @@ import { updatePositionText } from './UIManager';
 
 // プレイヤー配置
 export function placePlayer(scene: FieldScene) {
-  const x = scene.grid[scene.playerGridY][scene.playerGridX].x;
-  const y = scene.grid[scene.playerGridY][scene.playerGridX].y;
-  scene.playerMarker = scene.add.sprite(x + 32, y + 32, 'character_down_1');
-  scene.playerMarker.setOrigin(0.5, 0.6);
+  const x = scene.grid[scene.playerGridY][scene.playerGridX].x + 32;
+  const y = scene.grid[scene.playerGridY][scene.playerGridX].y + 32;
+  scene.playerMarker = scene.add.sprite(x, y, 'character_down_1');
+  scene.playerMarker.setOrigin(0.5, 0.5);
   scene.playerMarker.setScale(1.7);
   scene.playerMarker.setDepth(1000);
-  scene.cameras.main.startFollow(scene.playerMarker, true, 0.1, 0.1);   // ここでカメラ追尾を有効化
+  scene.cameras.main.startFollow(scene.playerMarker, true, 0.1, 0.1);
 }
 
 // シームレスなリアルタイム移動（上下左右のみ、斜め禁止）
@@ -44,14 +44,30 @@ export function updatePlayerMovement(
   const gridX = Math.floor(nextX / 64);
   const gridY = Math.floor(nextY / 64);
 
-  // 範囲外・移動不可タイルなら止める
-  if (
-    gridX < 0 || gridX >= scene.mapSize ||
-    gridY < 0 || gridY >= scene.mapSize ||
-    scene.mapData[gridY][gridX] === 1 || scene.mapData[gridY][gridX] === 3
-  ) {
-    return;
+  // --- 追加：矩形による当たり判定 ---
+  const playerWidth = scene.playerMarker.displayWidth;
+  const playerHeight = scene.playerMarker.displayHeight;
+  const nextRect = new Phaser.Geom.Rectangle(
+    nextX - playerWidth / 2,
+    nextY - playerHeight / 2,
+    playerWidth,
+    playerHeight
+  );
+
+  for (let gy = Math.floor(nextRect.y / 64); gy <= Math.floor((nextRect.bottom - 1) / 64); gy++) {
+    for (let gx = Math.floor(nextRect.x / 64); gx <= Math.floor((nextRect.right - 1) / 64); gx++) {
+      if (
+        gx < 0 || gx >= scene.mapSize ||
+        gy < 0 || gy >= scene.mapSize ||
+        scene.mapData[gy][gx] === 1 ||
+        scene.mapData[gy][gx] === 3 ||
+        scene.mapData[gy][gx] === 5
+      ) {
+        return; // どこか1マスでもバリケード等なら移動不可
+      }
+    }
   }
+  // --- ここまで追加 ---
 
   // 実際に移動
   scene.playerMarker.x += vx;
@@ -93,7 +109,7 @@ export function updatePlayerMovement(
 
 // プレイヤーの方向移動
 export function moveInDirection(scene: FieldScene, direction: string) {
-  if (scene.isMoving) return; // ← 追加
+  if (scene.isMoving) return;
 
   let newPlayerX = scene.playerGridX;
   let newPlayerY = scene.playerGridY;
@@ -116,7 +132,7 @@ export function moveInDirection(scene: FieldScene, direction: string) {
   }
 
   const tileType = scene.mapData[newPlayerY][newPlayerX];
-  if (tileType === 1 || tileType === 3) {
+  if (tileType === 1 || tileType === 3 || tileType === 5) {
     return;
   }
 
@@ -145,9 +161,9 @@ export function movePlayerToGrid(scene: FieldScene) {
 
   scene.tweens.add({
     targets: scene.playerMarker,
-    x: x + 32,
-    y: y + 32,
-    duration: 120, // ← 速さは調整
+    x: x, // ← 修正
+    y: y, // ← 修正
+    duration: 120,
     ease: 'Linear',
     onUpdate: () => {
       if (scene.cameras.main && scene.playerMarker) {
@@ -155,7 +171,7 @@ export function movePlayerToGrid(scene: FieldScene) {
       }
     },
     onComplete: () => {
-      scene.isMoving = false; // ← 追加
+      scene.isMoving = false;
     }
   });
 }
