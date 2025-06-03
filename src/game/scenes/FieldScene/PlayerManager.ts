@@ -7,7 +7,7 @@ export function placePlayer(scene: FieldScene) {
   const y = scene.grid[scene.playerGridY][scene.playerGridX].y + 32;
   scene.playerMarker = scene.add.sprite(x, y, 'character_down_1');
   scene.playerMarker.setOrigin(0.5, 0.5);
-  scene.playerMarker.setScale(1.7);
+  scene.playerMarker.setScale(1.0);
   scene.playerMarker.setDepth(1000);
   scene.cameras.main.startFollow(scene.playerMarker, true, 0.1, 0.1);
 }
@@ -44,30 +44,10 @@ export function updatePlayerMovement(
   const gridX = Math.floor(nextX / 64);
   const gridY = Math.floor(nextY / 64);
 
-  // --- 追加：矩形による当たり判定 ---
-  const playerWidth = scene.playerMarker.displayWidth;
-  const playerHeight = scene.playerMarker.displayHeight;
-  const nextRect = new Phaser.Geom.Rectangle(
-    nextX - playerWidth / 2,
-    nextY - playerHeight / 2,
-    playerWidth,
-    playerHeight
-  );
-
-  for (let gy = Math.floor(nextRect.y / 64); gy <= Math.floor((nextRect.bottom - 1) / 64); gy++) {
-    for (let gx = Math.floor(nextRect.x / 64); gx <= Math.floor((nextRect.right - 1) / 64); gx++) {
-      if (
-        gx < 0 || gx >= scene.mapSize ||
-        gy < 0 || gy >= scene.mapSize ||
-        scene.mapData[gy][gx] === 1 ||
-        scene.mapData[gy][gx] === 3 ||
-        scene.mapData[gy][gx] === 5
-      ) {
-        return; // どこか1マスでもバリケード等なら移動不可
-      }
-    }
+  // マイナス座標なら移動しない
+  if (gridX < 0 || gridY < 0) {
+    return;
   }
-  // --- ここまで追加 ---
 
   // 実際に移動
   scene.playerMarker.x += vx;
@@ -128,11 +108,6 @@ export function moveInDirection(scene: FieldScene, direction: string) {
     newPlayerY < 0 ||
     newPlayerY >= scene.mapSize
   ) {
-    return;
-  }
-
-  const tileType = scene.mapData[newPlayerY][newPlayerX];
-  if (tileType === 1 || tileType === 3 || tileType === 5) {
     return;
   }
 

@@ -1,9 +1,14 @@
-// タイル
+// タイル画像（未使用だがアセットとして保持）
 import grassTile from '../../assets/grass.png';
 import forestTile from '../../assets/forest.png';
 import brickTile from '../../assets/brick.png';
 import woodBarrierTile from '../../assets/wood_barrier.png';
 import woodBarrierVerticalTile from '../../assets/wood_barrier_vertical.png';
+import seaTile1 from '../../assets/sea1.png';
+import seaTile2 from '../../assets/sea2.png';
+import seaTile3 from '../../assets/sea3.png';
+import seaTile4 from '../../assets/sea4.png';
+import carminaBigBg from '../../assets/carmina_big_bg.png';
 
 // 主人公用の画像
 import characterDown1 from '../../assets/character_down_1.png';
@@ -48,13 +53,18 @@ import character3Left2 from '../../assets/character3_left_2.png';
 // BGM
 import fieldBgm from '../../assets/field_bgm.mp3';
 
-// エクスポート
+// タイル画像のエクスポート（今は未使用だが、再利用のため残す）
 export const tiles = {
   grass: grassTile,
   forest: forestTile,
   brick: brickTile,
   wood_barrier: woodBarrierTile,
   wood_barrier_vertical: woodBarrierVerticalTile,
+  sea1: seaTile1,
+  sea2: seaTile2,
+  sea3: seaTile3,
+  sea4: seaTile4,
+  carmina_big_bg: carminaBigBg,
 };
 
 export const characters = {
@@ -88,7 +98,7 @@ export const audio = {
   fieldBgm
 };
 
-// 元のコードとの互換性のために個別にエクスポート（必要な場合）
+// 必要に応じて個別エクスポート（互換性維持用、未使用なら削除可）
 export {
   grassTile,
   characterDown1,
@@ -99,5 +109,6 @@ export {
   characterUp2,
   characterLeft1,
   characterLeft2,
-  fieldBgm
+  fieldBgm,
+  carminaBigBg
 };

@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { tiles, characters, audio } from '../../assets';
+import { characters, audio } from '../../assets';
 import { createUI, showMessage } from './UIManager';
 import { createGrid, initializeMapData, updateChunks } from './MapManager';
 import { createEditorUI, destroyEditorUI } from './EditorManager';
@@ -57,14 +57,8 @@ export class FieldScene extends Phaser.Scene {
   }
 
   preload() {
-    // デバッグ: brick画像のパス確認
-    console.log('brick:', tiles.brick);
-
-    this.load.image('grass', tiles.grass);
-    this.load.image('forest', tiles.forest);
-    this.load.image('brick', tiles.brick);
-    this.load.image('wood_barrier', tiles.wood_barrier);
-    this.load.image('wood_barrier_vertical', tiles.wood_barrier_vertical);
+    // タイル画像のロード処理を全て削除
+    // キャラクター画像やBGMなど、タイル以外のアセットは必要に応じて残してください
 
     this.load.image('character_down_1', characters.player.down[0]);
     this.load.image('character_down_2', characters.player.down[1]);
@@ -77,16 +71,15 @@ export class FieldScene extends Phaser.Scene {
 
     this.load.audio('field_bgm', audio.fieldBgm);
 
-    this.load.once('filecomplete-image-brick', () => {
-      console.log('brick loaded!');
-    });
-
     this.load.on('complete', () => {
       console.log('FieldScene: すべてのアセットが読み込まれました');
     });
   }
 
   create() {
+    this.cameras.main.setBounds(0, 0, this.mapSize * 64, this.mapSize * 64);
+    this.cameras.main.setZoom(1.0);
+
     this.cursors = this.input.keyboard?.createCursorKeys();
 
     this.anims.create({
