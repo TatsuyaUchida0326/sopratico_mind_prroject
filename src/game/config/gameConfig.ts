@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { FieldScene } from '../scenes/FieldScene';
+import FieldScene from '../scenes/FieldScene'; // FieldSceneをdefault import
 
 /**
  * Phaserゲーム設定を生成する関数
@@ -9,11 +9,9 @@ import { FieldScene } from '../scenes/FieldScene';
 const createGameConfig = (parent: HTMLElement): Phaser.Types.Core.GameConfig => {
   return {
     type: Phaser.CANVAS,
-    width: 1024, // 数値で指定
-    height: 768, // 数値で指定
     parent,
     backgroundColor: '#000000',
-    scene: [FieldScene], // BattleSceneを削除
+    scene: [FieldScene], // FieldSceneを有効化
     render: {
       pixelArt: true,
       antialias: false,
@@ -23,7 +21,7 @@ const createGameConfig = (parent: HTMLElement): Phaser.Types.Core.GameConfig => 
       powerPreference: 'high-performance' // GPUパフォーマンス優先
     },
     scale: {
-      mode: Phaser.Scale.RESIZE, // RESIZEではなくFIT推奨
+      mode: Phaser.Scale.RESIZE, // ウィンドウサイズに合わせてリサイズ
       autoCenter: Phaser.Scale.CENTER_BOTH
       // width/heightはここでは指定しない
     },

@@ -1,14 +1,95 @@
 // タイル画像（未使用だがアセットとして保持）
 import grassTile from '../../assets/grass.png';
 import forestTile from '../../assets/forest.png';
-import brickTile from '../../assets/brick.png';
+import rockTile from '../../assets/rock.png';
 import woodBarrierTile from '../../assets/wood_barrier.png';
 import woodBarrierVerticalTile from '../../assets/wood_barrier_vertical.png';
 import seaTile1 from '../../assets/sea1.png';
 import seaTile2 from '../../assets/sea2.png';
 import seaTile3 from '../../assets/sea3.png';
 import seaTile4 from '../../assets/sea4.png';
-import carminaBigBg from '../../assets/carmina_big_bg.png';
+import wall1 from '../../assets/wall1.png';
+import wall2 from '../../assets/wall2.png';
+import wall3 from '../../assets/wall3.png';
+import wall4 from '../../assets/wall4.png';
+import wall5 from '../../assets/wall5.png';
+import wall6 from '../../assets/wall6.png';
+import wall7 from '../../assets/wall7.png';
+import wall8 from '../../assets/wall8.png';
+import wall9 from '../../assets/wall9.png';
+import wall10 from '../../assets/wall10.png';
+import wall11 from '../../assets/wall11.png';
+import wall12 from '../../assets/wall12.png';
+import wall13 from '../../assets/wall13.png';
+import wall14 from '../../assets/wall14.png';
+import wall15 from '../../assets/wall15.png';
+import wall16 from '../../assets/wall16.png';
+import wall17 from '../../assets/wall17.png';
+import wall18 from '../../assets/wall18.png';
+import wall19 from '../../assets/wall19.png';
+
+// --- 新規追加タイル ---
+// 食器1～7
+import dish1 from '../../assets/dish1.png';
+import dish2 from '../../assets/dish2.png';
+import dish3 from '../../assets/dish3.png';
+import dish4 from '../../assets/dish4.png';
+import dish5 from '../../assets/dish5.png';
+import dish6 from '../../assets/dish6.png';
+import dish7 from '../../assets/dish7.png';
+// 樽1～2
+import barrel1 from '../../assets/barrel1.png';
+import barrel2 from '../../assets/barrel2.png';
+// 壺1～2
+import pot1 from '../../assets/pot1.png';
+import pot2 from '../../assets/pot2.png';
+// 暖炉1～6
+import fireplace1 from '../../assets/fireplace1.png';
+import fireplace2 from '../../assets/fireplace2.png';
+import fireplace3 from '../../assets/fireplace3.png';
+import fireplace4 from '../../assets/fireplace4.png';
+import fireplace5 from '../../assets/fireplace5.png';
+import fireplace6 from '../../assets/fireplace6.png';
+import fireplace7 from '../../assets/fireplace7.png';
+import fireplace8 from '../../assets/fireplace8.png';
+import fireplace9 from '../../assets/fireplace9.png';
+import fireplace10 from '../../assets/fireplace10.png';
+import fireplace11 from '../../assets/fireplace11.png';
+import fireplace12 from '../../assets/fireplace12.png';
+import fireplace13 from '../../assets/fireplace13.png';
+// 棚1～2
+import shelf1 from '../../assets/shelf1.png';
+import shelf2 from '../../assets/shelf2.png';
+// 椅子1
+import chair1 from '../../assets/chair1.png';
+// ピアノ1～3
+import piano1 from '../../assets/piano1.png';
+import piano2 from '../../assets/piano2.png';
+import piano3 from '../../assets/piano3.png';
+// 床石1～3
+import floorStone1 from '../../assets/floorStone1.png';
+import floorStone2 from '../../assets/floorStone2.png';
+import floorStone3 from '../../assets/floorStone3.png';
+// 床板1～2
+import floorWood1 from '../../assets/floorWood1.png';
+import floorWood2 from '../../assets/floorWood2.png';
+// 絨毯1～7
+import carpet1 from '../../assets/carpet1.png';
+import carpet2 from '../../assets/carpet2.png';
+import carpet3 from '../../assets/carpet3.png';
+import carpet4 from '../../assets/carpet4.png';
+import carpet5 from '../../assets/carpet5.png';
+import carpet6 from '../../assets/carpet6.png';
+import carpet7 from '../../assets/carpet7.png';
+// カウンター1～8
+import counter1 from '../../assets/counter1.png';
+import counter2 from '../../assets/counter2.png';
+import counter3 from '../../assets/counter3.png';
+import counter4 from '../../assets/counter4.png';
+import counter5 from '../../assets/counter5.png';
+import counter6 from '../../assets/counter6.png';
+import counter7 from '../../assets/counter7.png';
+import counter8 from '../../assets/counter8.png';
 
 // 主人公用の画像
 import characterDown1 from '../../assets/character_down_1.png';
@@ -53,18 +134,47 @@ import character3Left2 from '../../assets/character3_left_2.png';
 // BGM
 import fieldBgm from '../../assets/field_bgm.mp3';
 
-// タイル画像のエクスポート（今は未使用だが、再利用のため残す）
-export const tiles = {
+// tilesの型をRecord<string, string>で明示
+export const tiles: Record<string, string> = {
   grass: grassTile,
   forest: forestTile,
-  brick: brickTile,
+  rock: rockTile,
   wood_barrier: woodBarrierTile,
   wood_barrier_vertical: woodBarrierVerticalTile,
   sea1: seaTile1,
   sea2: seaTile2,
   sea3: seaTile3,
   sea4: seaTile4,
-  carmina_big_bg: carminaBigBg,
+  wall1,
+  wall2,
+  wall3,
+  wall4,
+  wall5,
+  wall6,
+  wall7,
+  wall8,
+  wall9,
+  wall10,
+  wall11,
+  wall12,
+  wall13,
+  wall14,
+  wall15,
+  wall16,
+  wall17,
+  wall18,
+  wall19,
+  dish1, dish2, dish3, dish4, dish5, dish6, dish7,
+  barrel1, barrel2,
+  pot1, pot2,
+  fireplace1, fireplace2, fireplace3, fireplace4, fireplace5, fireplace6, fireplace7, fireplace8, fireplace9, fireplace10, fireplace11, fireplace12, fireplace13,
+  shelf1, shelf2,
+  chair1,
+  piano1, piano2, piano3,
+  floorStone1, floorStone2, floorStone3,
+  floorWood1, floorWood2,
+  carpet1, carpet2, carpet3, carpet4, carpet5, carpet6, carpet7,
+  counter1, counter2, counter3, counter4, counter5, counter6, counter7, counter8
 };
 
 export const characters = {
@@ -110,5 +220,19 @@ export {
   characterLeft1,
   characterLeft2,
   fieldBgm,
-  carminaBigBg
+  wall1, wall2, wall3, wall4, wall5, wall6, wall7,
+  wall8, wall9, wall10, wall11, wall12, wall13, wall14,
+  wall15, wall16, wall17, wall18, wall19,
+  // 新規追加
+  dish1, dish2, dish3, dish4, dish5, dish6, dish7,
+  barrel1, barrel2,
+  pot1, pot2,
+  fireplace1, fireplace2, fireplace3, fireplace4, fireplace5, fireplace6,
+  shelf1, shelf2,
+  chair1,
+  piano1, piano2, piano3,
+  floorStone1, floorStone2, floorStone3,
+  floorWood1, floorWood2,
+  carpet1, carpet2, carpet3, carpet4, carpet5, carpet6, carpet7,
+  counter1, counter2, counter3, counter4, counter5, counter6, counter7, counter8
 };

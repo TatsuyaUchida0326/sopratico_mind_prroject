@@ -1,4 +1,4 @@
-import type { FieldScene } from './FieldSceneTypes';
+import type { FieldScene } from './index';
 
 // UIの作成
 export function createUI(scene: FieldScene) {
@@ -28,10 +28,10 @@ export function createUI(scene: FieldScene) {
       backgroundColor: '#000000',
       align: 'right'
     }
-  );
-  scene.helpText.setOrigin(1, 0);
-  scene.helpText.setScrollFactor(0);
-  scene.helpText.setDepth(2000);
+  ) as Phaser.GameObjects.Text;
+  (scene.helpText as Phaser.GameObjects.Text).setOrigin(1, 0);
+  (scene.helpText as Phaser.GameObjects.Text).setScrollFactor(0);
+  (scene.helpText as Phaser.GameObjects.Text).setDepth(2000);
 
   scene.input.keyboard?.on('keydown-M', scene.toggleMiniMap, scene);
 
@@ -49,10 +49,11 @@ export function createUI(scene: FieldScene) {
 // 座標表示の更新
 export function updatePositionText(scene: FieldScene) {
   if (scene.positionText) {
+    const tileId = scene.mapData[0][scene.playerGridY][scene.playerGridX]; // ← レイヤー0を明示
     scene.positionText.setText(`X: ${scene.playerGridX}, Y: ${scene.playerGridY} - ${
-      scene.mapData[scene.playerGridY][scene.playerGridX] === 0 ? '草原' :
-      scene.mapData[scene.playerGridY][scene.playerGridX] === 1 ? '森' :
-      scene.mapData[scene.playerGridY][scene.playerGridX] === 2 ? 'お城' : '岩山'
+      tileId === 0 ? '草原' :
+      tileId === 1 ? '森' :
+      tileId === 2 ? 'お城' : '岩山'
     }`);
   }
 }

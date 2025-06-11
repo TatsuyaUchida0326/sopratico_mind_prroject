@@ -1,4 +1,4 @@
-import type { FieldScene } from './FieldSceneTypes';
+import type { FieldScene } from './index';
 import { updatePositionText } from './UIManager';
 
 // プレイヤー配置
@@ -7,7 +7,7 @@ export function placePlayer(scene: FieldScene) {
   const y = scene.grid[scene.playerGridY][scene.playerGridX].y + 32;
   scene.playerMarker = scene.add.sprite(x, y, 'character_down_1');
   scene.playerMarker.setOrigin(0.5, 0.5);
-  scene.playerMarker.setScale(1.0);
+  scene.playerMarker.setDisplaySize(32, 32);
   scene.playerMarker.setDepth(1000);
   scene.cameras.main.startFollow(scene.playerMarker, true, 0.1, 0.1);
 }
@@ -41,20 +41,29 @@ export function updatePlayerMovement(
   // 次に進むグリッド座標を計算
   const nextX = scene.playerMarker.x + vx;
   const nextY = scene.playerMarker.y + vy;
-  const gridX = Math.floor(nextX / 64);
-  const gridY = Math.floor(nextY / 64);
+  const gridX = Math.floor(nextX / 32);
+  const gridY = Math.floor(nextY / 32);
 
-  // マイナス座標なら移動しない
-  if (gridX < 0 || gridY < 0) {
+  // --- ここから修正 ---
+  // 範囲外なら移動しない（0～mapSize-1の範囲のみ許可）
+  if (
+    gridX < 0 ||
+    gridY < 0 ||
+    gridX >= scene.mapSize ||
+    gridY >= scene.mapSize
+  ) {
     return;
   }
+  // --- ここまで修正 ---
 
   // 実際に移動
   scene.playerMarker.x += vx;
   scene.playerMarker.y += vy;
 
-  // カメラ追尾
-  scene.cameras.main.centerOn(scene.playerMarker.x, scene.playerMarker.y);
+  // カメラ追尾（マップ範囲内のみ）
+  const camX = Phaser.Math.Clamp(scene.playerMarker.x, 16, (scene.mapSize - 1) * 32 + 16);
+  const camY = Phaser.Math.Clamp(scene.playerMarker.y, 16, (scene.mapSize - 1) * 32 + 16);
+  scene.cameras.main.centerOn(camX, camY);
 
   // グリッド座標の更新
   scene.playerGridX = gridX;
@@ -82,13 +91,13 @@ export function updatePlayerMovement(
   if (Phaser.Input.Keyboard.JustDown(scene.spaceKey as Phaser.Input.Keyboard.Key)) {
     showMessage(
       scene,
-      `現在地: (${scene.playerGridX}, ${scene.playerGridY})\nタイル: ${getTileTypeName(scene.mapData[scene.playerGridY][scene.playerGridX])}`
+      `現在地: (${scene.playerGridX}, ${scene.playerGridY})\nタイル: ${getTileTypeName(scene.mapData[0][scene.playerGridY][scene.playerGridX])}`
     );
   }
 }
 
 // プレイヤーの方向移動
-export function moveInDirection(scene: FieldScene, direction: string) {
+export function moveInDirection(scene: FieldScene, direction: 'down' | 'up' | 'left' | 'right') {
   if (scene.isMoving) return;
 
   let newPlayerX = scene.playerGridX;
@@ -142,7 +151,10 @@ export function movePlayerToGrid(scene: FieldScene) {
     ease: 'Linear',
     onUpdate: () => {
       if (scene.cameras.main && scene.playerMarker) {
-        scene.cameras.main.centerOn(scene.playerMarker.x, scene.playerMarker.y);
+        // カメラ追従も範囲内に制限
+        const camX = Phaser.Math.Clamp(scene.playerMarker.x, 16, (scene.mapSize - 1) * 32 + 16);
+        const camY = Phaser.Math.Clamp(scene.playerMarker.y, 16, (scene.mapSize - 1) * 32 + 16);
+        scene.cameras.main.centerOn(camX, camY);
       }
     },
     onComplete: () => {

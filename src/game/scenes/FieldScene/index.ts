@@ -1,220 +1,200 @@
 import Phaser from 'phaser';
-import { characters, audio } from '../../assets';
-import { createUI, showMessage } from './UIManager';
-import { createGrid, initializeMapData, updateChunks } from './MapManager';
 import { createEditorUI, destroyEditorUI } from './EditorManager';
-import {
-  placePlayer,
-  updatePlayerMovement,
-  animatePlayer
-} from './PlayerManager';
-import { getTileTypeName } from './TileUtils';
+import { characters, tiles } from '../../assets/index';
+import { createGrid, initializeMapData, updateChunks, loadChunk, unloadChunk } from './MapManager';
 
-export class FieldScene extends Phaser.Scene {
-  public grid: { x: number; y: number }[][] = [];
-  public playerMarker?: Phaser.GameObjects.Sprite;
-  public lastDirection: string = 'down';
-  public miniMapActive: boolean = false;
-  public mapSize: number = 20;
-  public cursors?: Phaser.Types.Input.Keyboard.CursorKeys;
-  public canMove: boolean = true;
-  public playerGridX: number = 2;
-  public playerGridY: number = 2;
-  public movementSpeed: number = 0.3;
-  public mapData: number[][] = [];
-  public spaceKey?: Phaser.Input.Keyboard.Key;
-  public currentMessage?: Phaser.GameObjects.Text;
-  public bgm?: Phaser.Sound.BaseSound;
-  public nextMoveDirection: string | null = null;
-  public chunkSize: number = 16;
-  public activeChunks = new Map<string, Map<string, Phaser.GameObjects.GameObject[]>>();
-  public isMoving: boolean = false;
-  public loadDistance: number = 2;
-  public lastPlayerChunkX: number = -1;
-  public lastPlayerChunkY: number = -1;
+// --- FieldSceneクラス定義 ---
+class FieldScene extends Phaser.Scene {
+  grid!: { x: number; y: number }[][];
+  mapSize = 32; // 一般的な村サイズ
+  mapData: any;
+  playerGridX = 0;
+  playerGridY = 0;
+  chunkSize = 8;
+  lastPlayerChunkX = -1;
+  lastPlayerChunkY = -1;
+  loadDistance = 1;
+  editMode: boolean = false;
+  spaceKey?: Phaser.Input.Keyboard.Key;
+  isMoving?: boolean;
+  canMove: boolean = true;
+  movementSpeed: number = 1;
+  activeChunks = new Map<string, Map<string, Phaser.GameObjects.GameObject[]>>();
+  playerMarker?: Phaser.GameObjects.Sprite;
+  dragPreview?: Phaser.GameObjects.GameObject;
+  helpText?: Phaser.GameObjects.Text;
+  positionText?: Phaser.GameObjects.Text;
+  speedText?: Phaser.GameObjects.Text;
+  currentMessage?: Phaser.GameObjects.Text;
 
-  // マップエディター関連プロパティ
-  public editMode: boolean = false;
-  public selectedTileType: string = 'grass';
-  public paletteUI?: Phaser.GameObjects.Container;
-  public dragPreview?: Phaser.GameObjects.Image;
-  public helpText?: Phaser.GameObjects.Text;
+  // キャラクター・座標表示用
+  player?: Phaser.GameObjects.Sprite;
+  cursors?: Phaser.Types.Input.Keyboard.CursorKeys;
+  coordText?: Phaser.GameObjects.Text;
+  lastDirection: 'down' | 'up' | 'left' | 'right' = 'down';
 
-  // UI関連のプロパティ
-  public positionText?: Phaser.GameObjects.Text;
-  public speedText?: Phaser.GameObjects.Text;
+  // ミニマップ切り替え用
+  miniMapVisible: boolean = false;
 
   constructor() {
-    super({
-      key: 'FieldScene',
-      physics: {
-        default: 'arcade',
-        arcade: {
-          fps: 120
-        }
-      }
-    });
+    super('FieldScene');
   }
 
   preload() {
-    // タイル画像のロード処理を全て削除
-    // キャラクター画像やBGMなど、タイル以外のアセットは必要に応じて残してください
-
-    this.load.image('character_down_1', characters.player.down[0]);
-    this.load.image('character_down_2', characters.player.down[1]);
-    this.load.image('character_up_1', characters.player.up[0]);
-    this.load.image('character_up_2', characters.player.up[1]);
-    this.load.image('character_left_1', characters.player.left[0]);
-    this.load.image('character_left_2', characters.player.left[1]);
-    this.load.image('character_right_1', characters.player.right[0]);
-    this.load.image('character_right_2', characters.player.right[1]);
-
-    this.load.audio('field_bgm', audio.fieldBgm);
-
-    this.load.on('complete', () => {
-      console.log('FieldScene: すべてのアセットが読み込まれました');
+    // キャラクター画像のプリロード
+    this.load.image('playerDown1', characters.player.down[0]);
+    this.load.image('playerDown2', characters.player.down[1]);
+    this.load.image('playerUp1', characters.player.up[0]);
+    this.load.image('playerUp2', characters.player.up[1]);
+    this.load.image('playerLeft1', characters.player.left[0]);
+    this.load.image('playerLeft2', characters.player.left[1]);
+    this.load.image('playerRight1', characters.player.right[0]);
+    this.load.image('playerRight2', characters.player.right[1]);
+    Object.entries(tiles).forEach(([key, src]) => {
+      this.load.image(key, src);
     });
   }
 
   create() {
-    this.cameras.main.setBounds(0, 0, this.mapSize * 64, this.mapSize * 64);
-    this.cameras.main.setZoom(1.0);
-
-    this.cursors = this.input.keyboard?.createCursorKeys();
-
-    this.anims.create({
-      key: 'player_down',
-      frames: [{ key: 'character_down_1' }, { key: 'character_down_2' }],
-      frameRate: 10,
-      repeat: -1
-    });
-    this.anims.create({
-      key: 'player_up',
-      frames: [{ key: 'character_up_1' }, { key: 'character_up_2' }],
-      frameRate: 10,
-      repeat: -1
-    });
-    this.anims.create({
-      key: 'player_left',
-      frames: [{ key: 'character_left_1' }, { key: 'character_left_2' }],
-      frameRate: 10,
-      repeat: -1
-    });
-    this.anims.create({
-      key: 'player_right',
-      frames: [{ key: 'character_right_1' }, { key: 'character_right_2' }],
-      frameRate: 10,
-      repeat: -1
-    });
-
     createGrid(this);
-
-    this.spaceKey = this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-
     initializeMapData(this);
 
-    placePlayer(this);
-    createUI(this);
-
-    this.bgm = this.sound.add('field_bgm', { loop: true, volume: 0.5 });
-    this.bgm.play();
-
-    // カメラ設定の追加
-    this.cameras.main.setBounds(0, 0, this.mapSize * 64, this.mapSize * 64);
-    this.cameras.main.setZoom(1.0);
-    this.cameras.main.roundPixels = true;
-    this.cameras.main.setBackgroundColor(0x000000);
-    this.cameras.main.setLerp(0, 0);
-    this.cameras.main.setDeadzone(0, 0);
-
-    // プレイヤーをカメラが追従
-    if (this.playerMarker) {
-      this.cameras.main.startFollow(this.playerMarker, true, 0, 0);
-    } else {
-      // プレイヤーがいない場合はマップ中央にカメラを合わせる
-      this.cameras.main.centerOn(this.playerGridX * 64, this.playerGridY * 64);
-    }
-
-    this.input.keyboard?.on('keydown-E', () => this.toggleEditMode(), this);
-
-    this.input.on('wheel', (_pointer: Phaser.Input.Pointer, _gameObjects: any, _deltaX: number, deltaY: number) => {
-      let zoom = this.cameras.main.zoom;
-      if (deltaY > 0) {
-        zoom -= 0.1;
+    this.input.keyboard?.on('keydown-E', () => {
+      this.editMode = !this.editMode;
+      if (this.editMode) {
+        createEditorUI(this);
       } else {
-        zoom += 0.1;
+        destroyEditorUI(this);
       }
-      zoom = Phaser.Math.Clamp(zoom, 0.5, 2);
-      this.cameras.main.setZoom(zoom);
     });
 
-    updateChunks(this);
-
-    console.log('FieldScene: create完了');
-  }
-
-  update(time: number, _delta: number) {
-    // デバッグ: updateが毎フレーム呼ばれているか確認
-    console.log('update');
-
-    updatePlayerMovement(this, showMessage, getTileTypeName);
-    if (time % 5 === 0) {
-      updateChunks(this);
-    }
-    animatePlayer(this);
-
-    // 座標表示の更新を追加
-    if (this.positionText) {
-      this.positionText.setText(`x: ${this.playerGridX}, y: ${this.playerGridY}`);
-    }
-  }
-
-  public toggleMiniMap() {
-    this.miniMapActive = !this.miniMapActive;
-
-    if (this.miniMapActive) {
-      // フィールド全体が画面に収まるズーム値を計算
-      const zoomX = this.cameras.main.width / (this.mapSize * 64);
-      const zoomY = this.cameras.main.height / (this.mapSize * 64);
-      const zoom = Math.min(zoomX, zoomY);
-      
-      this.cameras.main.stopFollow();
-      this.cameras.main.setZoom(zoom);
-      this.cameras.main.setBounds(0, 0, this.mapSize * 64, this.mapSize * 64);
-      this.cameras.main.centerOn(
-        (this.mapSize * 64) / 2,
-        (this.mapSize * 64) / 2
-      );
-    } else {
-      // 通常表示に戻す
-      this.cameras.main.setZoom(1.0);
-      this.cameras.main.setBounds(0, 0, this.mapSize * 64, this.mapSize * 64);
-      if (this.playerMarker) {
-        this.cameras.main.startFollow(this.playerMarker, true, 0.1, 0.1);
-      } else {
-        this.cameras.main.centerOn(this.playerGridX * 64, this.playerGridY * 64);
-      }
-    }
-  }
-
-  private toggleEditMode() {
-    this.editMode = !this.editMode;
-
-    if (this.editMode) {
-      createEditorUI(this);
-    } else {
-      destroyEditorUI(this);
-    }
-
-    const modeText = this.add.text(
-      this.cameras.main.centerX,
-      100,
-      `${this.editMode ? 'エディターモード ON' : 'エディターモード OFF'}`,
-      { font: '24px Arial', color: '#ffffff', backgroundColor: '#000000' }
+    // プレイヤーキャラ生成
+    this.player = this.add.sprite(100, 100, 'playerDown1');
+    this.cursors = this.input.keyboard?.createCursorKeys();
+    this.coordText = this.add.text(
+      this.cameras.main.width / 2,
+      10,
+      '',
+      { fontSize: '16px', color: '#fff' }
     );
-    modeText.setOrigin(0.5);
-    modeText.setScrollFactor(0);
-    modeText.setDepth(2000);
-    this.time.delayedCall(2000, () => { modeText.destroy(); });
+    this.coordText.setOrigin(0.5, 0);
+    this.coordText.setScrollFactor(0);
+    this.coordText.setDepth(2000);
+
+    // --- アニメーション定義 ---
+    this.anims.create({
+      key: 'player-down',
+      frames: [
+        { key: 'playerDown1' },
+        { key: 'playerDown2' }
+      ],
+      frameRate: 8,
+      repeat: -1
+    });
+    this.anims.create({
+      key: 'player-up',
+      frames: [
+        { key: 'playerUp1' },
+        { key: 'playerUp2' }
+      ],
+      frameRate: 8,
+      repeat: -1
+    });
+    this.anims.create({
+      key: 'player-left',
+      frames: [
+        { key: 'playerLeft1' },
+        { key: 'playerLeft2' }
+      ],
+      frameRate: 8,
+      repeat: -1
+    });
+    this.anims.create({
+      key: 'player-right',
+      frames: [
+        { key: 'playerRight1' },
+        { key: 'playerRight2' }
+      ],
+      frameRate: 8,
+      repeat: -1
+    });
+
+    // カメラ追尾とマップ範囲設定
+    if (this.player) {
+      this.cameras.main.startFollow(this.player, true, 0.08, 0.08);
+      this.cameras.main.setBounds(0, 0, this.mapSize * 32, this.mapSize * 32);
+    }
+  }
+
+  // ミニマップの表示/非表示切り替え
+  toggleMiniMap(): void {
+    this.miniMapVisible = !this.miniMapVisible;
+    // 必要に応じてミニマップの表示・非表示処理をここに追加
+  }
+
+  update() {
+    if (this.player && this.cursors) {
+      let nextX = this.player.x;
+      let nextY = this.player.y;
+
+      if (this.cursors.left?.isDown) {
+        nextX -= 2;
+        this.player.anims.play('player-left', true);
+        this.lastDirection = 'left';
+      } else if (this.cursors.right?.isDown) {
+        nextX += 2;
+        this.player.anims.play('player-right', true);
+        this.lastDirection = 'right';
+      } else if (this.cursors.up?.isDown) {
+        nextY -= 2;
+        this.player.anims.play('player-up', true);
+        this.lastDirection = 'up';
+      } else if (this.cursors.down?.isDown) {
+        nextY += 2;
+        this.player.anims.play('player-down', true);
+        this.lastDirection = 'down';
+      } else {
+        // 停止時は最後の向きの1枚目画像に戻す
+        this.player.anims.stop();
+        switch (this.lastDirection) {
+          case 'left':
+            this.player.setTexture('playerLeft1');
+            break;
+          case 'right':
+            this.player.setTexture('playerRight1');
+            break;
+          case 'up':
+            this.player.setTexture('playerUp1');
+            break;
+          case 'down':
+          default:
+            this.player.setTexture('playerDown1');
+            break;
+        }
+      }
+
+      // --- 範囲チェック ---
+      const min = 0;
+      const max = this.mapSize * 32 - 1;
+      this.player.x = Phaser.Math.Clamp(nextX, min, max);
+      this.player.y = Phaser.Math.Clamp(nextY, min, max);
+    }
+
+    // 座標表示（タイル座標で表示）
+    if (this.player && this.coordText) {
+      const tileX = Math.floor(this.player.x / 32);
+      const tileY = Math.floor(this.player.y / 32);
+      this.coordText.setText(`X: ${tileX}, Y: ${tileY}`);
+    }
+
+    updateChunks(this);
+  }
+
+  shutdown() {
+    destroyEditorUI(this);
   }
 }
+
+export { createGrid, initializeMapData, updateChunks, loadChunk, unloadChunk };
+export { FieldScene };
+export default FieldScene;
