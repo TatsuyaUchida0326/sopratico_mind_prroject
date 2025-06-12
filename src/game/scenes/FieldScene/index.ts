@@ -55,6 +55,8 @@ class FieldScene extends Phaser.Scene {
     });
   }
 
+  highlightRect?: Phaser.GameObjects.Rectangle;
+
   create() {
       createGrid(this);
       initializeMapData(this);
@@ -118,6 +120,12 @@ class FieldScene extends Phaser.Scene {
         frameRate: 8,
         repeat: -1
       });
+
+      // ★ ハイライト用矩形を生成（1度だけ）
+      this.highlightRect = this.add.rectangle(0, 0, 32, 32)
+        .setStrokeStyle(2, 0xffff00)
+        .setOrigin(0)
+        .setDepth(9999);
 
       // カメラ追尾とマップ範囲設定
       if (this.player) {
@@ -194,6 +202,16 @@ class FieldScene extends Phaser.Scene {
       const max = this.mapSize * 32 - 1;
       this.player.x = Phaser.Math.Clamp(nextX, min, max);
       this.player.y = Phaser.Math.Clamp(nextY, min, max);
+    }
+
+    // ★ マウス座標に合わせてハイライト位置を更新
+    if (this.highlightRect) {
+      const pointer = this.input.activePointer;
+      const tileX = Math.floor(pointer.worldX / 32);
+      const tileY = Math.floor(pointer.worldY / 32);
+      this.highlightRect.x = tileX * 32;
+      this.highlightRect.y = tileY * 32;
+      this.highlightRect.setVisible(true);
     }
 
     // 座標表示（タイル座標で表示）
