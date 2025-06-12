@@ -8,8 +8,8 @@ class FieldScene extends Phaser.Scene {
   grid!: { x: number; y: number }[][];
   mapSize = 32; // 一般的な村サイズ
   mapData: any;
-  playerGridX = 0;
-  playerGridY = 0;
+  playerGridX = 14;
+  playerGridY = 31;
   chunkSize = 8;
   lastPlayerChunkX = -1;
   lastPlayerChunkY = -1;
@@ -71,7 +71,15 @@ class FieldScene extends Phaser.Scene {
       });
 
       // プレイヤーキャラ生成
-      this.player = this.add.sprite(100, 100, 'playerDown1');
+      this.player = this.add.sprite(
+        this.playerGridX * 32 + 16, // X座標
+        this.playerGridY * 32 + 16, // Y座標
+        'playerUp1'
+      );
+      this.player.setOrigin(0.5, 0.5);
+      this.player.setDepth(1000);
+      this.lastDirection = 'up';
+
       this.cursors = this.input.keyboard?.createCursorKeys();
       this.coordText = this.add.text(
         this.cameras.main.width / 2,

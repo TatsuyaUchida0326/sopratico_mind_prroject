@@ -49,6 +49,9 @@ const tileNameToId: Record<string, number> = {
 const objectTileNames = [
   'forest1',
   'rock',
+  'wall1', 'wall2', 'wall3', 'wall4', 'wall5', 'wall6', 'wall7', 'wall8', 'wall9',
+  'wall10', 'wall11', 'wall12', 'wall13', 'wall14', 'wall15', 'wall16', 'wall17', 'wall18', 'wall19',
+  'counter1', 'counter2', 'counter3', 'counter4', 'counter5', 'counter6', 'counter7', 'counter8',
   'dish1', 'dish2', 'dish3', 'dish4', 'dish5', 'dish6', 'dish7',
   'barrel1', 'barrel2',
   'pot1', 'pot2',
@@ -255,7 +258,14 @@ export function createEditorUI(scene: FieldScene) {
         delete scene.mapData[0][key];
       }
     } else {
-      setTile(scene, worldX, worldY, tileType);
+      const counterTileIds = [
+        130, 131, 132, 133, 134, 135, 136, 137
+      ];
+      if (counterTileIds.includes(tileId)) {
+        scene.mapData[1][`${worldX},${worldY}`] = [tileId];
+      } else {
+        setTile(scene, worldX, worldY, tileType);
+      }
     }
 
     // チャンク再読み込み

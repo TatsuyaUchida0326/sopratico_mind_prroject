@@ -173,6 +173,20 @@ export function loadChunk(scene: FieldScene, chunkKey: string) {
                 tile.x = x * 32;
                 tile.y = y * 32;
                 break;
+              // --- counter1～8は下に重ねる ---
+              case 'counter1':
+              case 'counter2':
+              case 'counter3':
+              case 'counter4':
+              case 'counter5':
+              case 'counter6':
+              case 'counter7':
+              case 'counter8':
+                tile.setOrigin(0, 0);
+                tile.x = x * 32;
+                tile.y = textureKey === 'counter5' ? y * 32 - 1 : y * 32;
+                tile.setDepth(tileDepth + layer - 1); // 他より下に
+                break;
               case 'dish1': case 'dish2': case 'dish3': case 'dish4': case 'dish5': case 'dish6': case 'dish7':
               case 'barrel1': case 'barrel2':
               case 'pot1': case 'pot2':
@@ -190,6 +204,19 @@ export function loadChunk(scene: FieldScene, chunkKey: string) {
               // wall1～9,15,16はデフォルト（中央・リサイズ）でOK
               default:
                 break;
+            }
+
+            // ★ wall1～19は常に最前面に
+            if (
+              textureKey === 'wall1' || textureKey === 'wall2' || textureKey === 'wall3' ||
+              textureKey === 'wall4' || textureKey === 'wall5' || textureKey === 'wall6' ||
+              textureKey === 'wall7' || textureKey === 'wall8' || textureKey === 'wall9' ||
+              textureKey === 'wall10' || textureKey === 'wall11' || textureKey === 'wall12' ||
+              textureKey === 'wall13' || textureKey === 'wall14' || textureKey === 'wall15' ||
+              textureKey === 'wall16' || textureKey === 'wall17' || textureKey === 'wall18' ||
+              textureKey === 'wall19'
+            ) {
+              tile.setDepth(9999); // 他のタイルより前面に
             }
 
             // --- forest1だけ元画像サイズ＆左下基準で再調整 ---
@@ -225,29 +252,101 @@ export function loadChunk(scene: FieldScene, chunkKey: string) {
           const tileId = cell[0]; // 先頭のみ
           const textureKey = tileIdToName[tileId];
           if (textureKey && tileImages[textureKey]) {
-            // 森タイルもobjectレイヤーなら同じsetDepth計算式を使う
+            // --- 個別配置・リサイズ処理 ---
+            let tile = scene.add.image(x * 32, y * 32, textureKey);
+            tile.setOrigin(0);
+
+            // 個別調整
+            switch (textureKey) {
+              case 'wall10':
+              case 'wall11':
+                tile.setOrigin(0, 0.5);
+                tile.x = x * 32;
+                tile.y = y * 32 + 16;
+                break;
+              case 'wall12':
+              case 'wall13':
+              case 'wall14':
+                tile.setOrigin(1, 0.5);
+                tile.x = (x + 1) * 32;
+                tile.y = y * 32 + 16;
+                break;
+              case 'wall17':
+                tile.setOrigin(1, 0);
+                tile.x = (x + 1) * 32;
+                tile.y = y * 32;
+                break;
+              case 'wall18':
+                tile.setOrigin(0.5, 0);
+                tile.x = x * 32 + 16;
+                tile.y = y * 32;
+                break;
+              case 'wall19':
+                tile.setOrigin(0, 0);
+                tile.x = x * 32;
+                tile.y = y * 32;
+                break;
+              // --- counter1～8は下に重ねる ---
+              case 'counter1':
+              case 'counter2':
+              case 'counter3':
+              case 'counter4':
+              case 'counter5':
+              case 'counter6':
+              case 'counter7':
+              case 'counter8':
+                tile.setOrigin(0, 0);
+                tile.x = x * 32;
+                tile.y = textureKey === 'counter5' ? y * 32 - 1 : y * 32;
+                tile.setDepth(-10 + layer - 1); // 他より下に
+                break;
+              case 'dish1': case 'dish2': case 'dish3': case 'dish4': case 'dish5': case 'dish6': case 'dish7':
+              case 'barrel1': case 'barrel2':
+              case 'pot1': case 'pot2':
+              case 'fireplace1': case 'fireplace2': case 'fireplace3': case 'fireplace4': case 'fireplace5': case 'fireplace6': case 'fireplace7': case 'fireplace8': case 'fireplace9':
+              case 'fireplace10': case 'fireplace11': case 'fireplace12': case 'fireplace13':
+              case 'shelf1': case 'shelf2':
+              case 'chair1':
+              case 'piano1': case 'piano2': case 'piano3':
+              case 'forest1':
+                tile.setOrigin(0.5, 0.5);
+                tile.x = x * 32 + 16;
+                tile.y = y * 32 + 16;
+                break;
+              default:
+                break;
+            }
+
+            // ★ wall1～19は常に最前面に
+            if (
+              textureKey === 'wall1' || textureKey === 'wall2' || textureKey === 'wall3' ||
+              textureKey === 'wall4' || textureKey === 'wall5' || textureKey === 'wall6' ||
+              textureKey === 'wall7' || textureKey === 'wall8' || textureKey === 'wall9' ||
+              textureKey === 'wall10' || textureKey === 'wall11' || textureKey === 'wall12' ||
+              textureKey === 'wall13' || textureKey === 'wall14' || textureKey === 'wall15' ||
+              textureKey === 'wall16' || textureKey === 'wall17' || textureKey === 'wall18' ||
+              textureKey === 'wall19'
+            ) {
+              tile.setDepth(9999);
+            }
+
+            // --- forest1だけ元画像サイズ＆左下基準で再調整 ---
             if (textureKey === 'forest1') {
-              let tile = scene.add.image(x * 32, y * 32, textureKey).setOrigin(0, 1);
               tile.setDisplaySize(tile.width, tile.height);
+              tile.setOrigin(0, 1);
               tile.x = x * 32;
               tile.y = (y + 1) * 32;
               tile.setDepth(10000 + y * scene.mapSize + x);
-              const key = `${x},${y}`;
-              if (!chunkMap.has(key)) chunkMap.set(key, []);
-              chunkMap.get(key)!.push(tile);
+            } else if (noResizeTiles.includes(textureKey)) {
+              tile.setDisplaySize(tile.width, tile.height);
+              tile.setDepth(-10 + layer + 1);
             } else {
-              const tileDepth = (window as any).selectedTileDepth ?? -10;
-              let tile = scene.add.image(x * 32, y * 32, textureKey).setOrigin(0);
-              if (noResizeTiles.includes(textureKey)) {
-                tile.setDisplaySize(tile.width, tile.height);
-              } else {
-                tile.setDisplaySize(32, 32);
-              }
-              tile.setDepth(tileDepth + layer + 1);
-              const key = `${x},${y}`;
-              if (!chunkMap.has(key)) chunkMap.set(key, []);
-              chunkMap.get(key)!.push(tile);
+              tile.setDisplaySize(32, 32);
+              tile.setDepth(-10 + layer + 1);
             }
+            const key = `${x},${y}`;
+            if (!chunkMap.has(key)) chunkMap.set(key, []);
+            chunkMap.get(key)!.push(tile);
           }
         }
       }
