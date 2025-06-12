@@ -56,74 +56,90 @@ class FieldScene extends Phaser.Scene {
   }
 
   create() {
-    createGrid(this);
-    initializeMapData(this);
+      createGrid(this);
+      initializeMapData(this);
 
-    this.input.keyboard?.on('keydown-E', () => {
-      this.editMode = !this.editMode;
-      if (this.editMode) {
-        createEditorUI(this);
-      } else {
-        destroyEditorUI(this);
+      this.input.keyboard?.on('keydown-E', () => {
+        this.editMode = !this.editMode;
+        if (this.editMode) {
+          createEditorUI(this);
+        } else {
+          destroyEditorUI(this);
+        }
+      });
+
+      // プレイヤーキャラ生成
+      this.player = this.add.sprite(100, 100, 'playerDown1');
+      this.cursors = this.input.keyboard?.createCursorKeys();
+      this.coordText = this.add.text(
+        this.cameras.main.width / 2,
+        10,
+        '',
+        { fontSize: '16px', color: '#fff' }
+      );
+      this.coordText.setOrigin(0.5, 0);
+      this.coordText.setScrollFactor(0);
+      this.coordText.setDepth(2000);
+
+      // --- アニメーション定義 ---
+      this.anims.create({
+        key: 'player-down',
+        frames: [
+          { key: 'playerDown1' },
+          { key: 'playerDown2' }
+        ],
+        frameRate: 8,
+        repeat: -1
+      });
+      this.anims.create({
+        key: 'player-up',
+        frames: [
+          { key: 'playerUp1' },
+          { key: 'playerUp2' }
+        ],
+        frameRate: 8,
+        repeat: -1
+      });
+      this.anims.create({
+        key: 'player-left',
+        frames: [
+          { key: 'playerLeft1' },
+          { key: 'playerLeft2' }
+        ],
+        frameRate: 8,
+        repeat: -1
+      });
+      this.anims.create({
+        key: 'player-right',
+        frames: [
+          { key: 'playerRight1' },
+          { key: 'playerRight2' }
+        ],
+        frameRate: 8,
+        repeat: -1
+      });
+
+      // カメラ追尾とマップ範囲設定
+      if (this.player) {
+        this.cameras.main.startFollow(this.player, true, 0.08, 0.08);
+        this.cameras.main.setBounds(0, 0, this.mapSize * 32, this.mapSize * 32);
       }
-    });
 
-    // プレイヤーキャラ生成
-    this.player = this.add.sprite(100, 100, 'playerDown1');
-    this.cursors = this.input.keyboard?.createCursorKeys();
-    this.coordText = this.add.text(
-      this.cameras.main.width / 2,
-      10,
-      '',
-      { fontSize: '16px', color: '#fff' }
-    );
-    this.coordText.setOrigin(0.5, 0);
-    this.coordText.setScrollFactor(0);
-    this.coordText.setDepth(2000);
+      this.activeChunks.forEach((chunkMap) => {
+        chunkMap.forEach((objs) => objs.forEach(obj => obj.destroy()));
+      });
+      this.activeChunks.clear();
 
-    // --- アニメーション定義 ---
-    this.anims.create({
-      key: 'player-down',
-      frames: [
-        { key: 'playerDown1' },
-        { key: 'playerDown2' }
-      ],
-      frameRate: 8,
-      repeat: -1
-    });
-    this.anims.create({
-      key: 'player-up',
-      frames: [
-        { key: 'playerUp1' },
-        { key: 'playerUp2' }
-      ],
-      frameRate: 8,
-      repeat: -1
-    });
-    this.anims.create({
-      key: 'player-left',
-      frames: [
-        { key: 'playerLeft1' },
-        { key: 'playerLeft2' }
-      ],
-      frameRate: 8,
-      repeat: -1
-    });
-    this.anims.create({
-      key: 'player-right',
-      frames: [
-        { key: 'playerRight1' },
-        { key: 'playerRight2' }
-      ],
-      frameRate: 8,
-      repeat: -1
-    });
-
-    // カメラ追尾とマップ範囲設定
-    if (this.player) {
-      this.cameras.main.startFollow(this.player, true, 0.08, 0.08);
-      this.cameras.main.setBounds(0, 0, this.mapSize * 32, this.mapSize * 32);
-    }
+      // ★ 全チャンクを強制ロード
+      const chunkCount = Math.ceil(this.mapSize / this.chunkSize);
+      for (let cy = 0; cy < chunkCount; cy++) {
+        for (let cx = 0; cx < chunkCount; cx++) {
+          const chunkKey = `${cx},${cy}`;
+          if (!this.activeChunks.has(chunkKey)) {
+            loadChunk(this, chunkKey);
+          }
+        }
+      }
   }
 
   // ミニマップの表示/非表示切り替え

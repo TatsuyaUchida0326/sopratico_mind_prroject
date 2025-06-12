@@ -1,7 +1,7 @@
 // タイル画像（未使用だがアセットとして保持）
 import grassTile from '../../assets/grass.png';
-import forestTile from '../../assets/forest.png';
 import rockTile from '../../assets/rock.png';
+import forest1 from '../../assets/forest1.png';
 import woodBarrierTile from '../../assets/wood_barrier.png';
 import woodBarrierVerticalTile from '../../assets/wood_barrier_vertical.png';
 import seaTile1 from '../../assets/sea1.png';
@@ -137,8 +137,8 @@ import fieldBgm from '../../assets/field_bgm.mp3';
 // tilesの型をRecord<string, string>で明示
 export const tiles: Record<string, string> = {
   grass: grassTile,
-  forest: forestTile,
   rock: rockTile,
+  forest1,
   wood_barrier: woodBarrierTile,
   wood_barrier_vertical: woodBarrierVerticalTile,
   sea1: seaTile1,
@@ -211,6 +211,7 @@ export const audio = {
 // 必要に応じて個別エクスポート（互換性維持用、未使用なら削除可）
 export {
   grassTile,
+  forest1,
   characterDown1,
   characterDown2,
   characterRight1,
